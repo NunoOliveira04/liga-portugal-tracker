@@ -204,3 +204,114 @@ h1 {
   padding: 2rem;
   margin: 1rem 0;
 }
+
+/* Tabela Classificativa */
+.standings-table {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  overflow-x: auto;
+}
+
+.standings-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.standings-table thead {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.standings-table th,
+.standings-table td {
+  padding: 0.8rem 0.6rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.standings-table th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  text-transform: uppercase;
+}
+
+.standings-table td {
+  font-size: 0.95rem;
+}
+
+.standings-table .position {
+  font-weight: bold;
+  width: 40px;
+}
+
+.standings-table .team-name {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: left;
+  min-width: 180px;
+}
+
+.standings-table .team-name img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.standings-table .points {
+  font-weight: bold;
+  color: #00b894;
+  font-size: 1.1rem;
+}
+
+.standings-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.standings-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Zonas da tabela */
+.standings-table tr.champions {
+  border-left: 3px solid #00b894;
+}
+
+.standings-table tr.relegation {
+  border-left: 3px solid #e74c3c;
+}
+
+/* Legenda */
+.standings-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #a0a0a0;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.champions-dot {
+  background: #00b894;
+}
+
+.relegation-dot {
+  background: #e74c3c;
+}
