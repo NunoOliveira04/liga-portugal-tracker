@@ -3,6 +3,14 @@ import './App.css'
 
 const API_KEY = import.meta.env.VITE_API_KEY
 const TOTAL_MATCHES = 34
+const IS_DEV = import.meta.env.DEV
+
+const fetchAPI = async (endpoint) => {
+  const headers = IS_DEV ? { 'X-Auth-Token': API_KEY } : {}
+  const response = await fetch(`/api/${endpoint}`, { headers })
+  if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
+  return response.json()
+}
 
 function App() {
   const [view, setView] = useState('menu')
@@ -18,11 +26,7 @@ function App() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/v4/competitions/PPL/teams', {
-        headers: { 'X-Auth-Token': API_KEY }
-      })
-      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
-      const data = await response.json()
+      const data = await fetchAPI('v4/competitions/PPL/teams')
       setTeams(data.teams)
       setView('selectTeam')
     } catch (err) {
@@ -37,12 +41,7 @@ function App() {
     setError(null)
     setSelectedTeam(team)
     try {
-      const response = await fetch(`/api/v4/teams/${team.id}/matches?status=SCHEDULED&limit=5`, {
-        headers: { 'X-Auth-Token': API_KEY }
-      })
-      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
-      const data = await response.json()
-      
+      const data = await fetchAPI(`v4/teams/${team.id}/matches?status=SCHEDULED&limit=5`)
       const ligaMatch = data.matches.find(m => m.competition.code === 'PPL')
       setNextMatch(ligaMatch || null)
       setView('nextMatch')
@@ -57,11 +56,7 @@ function App() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/v4/competitions/PPL/standings', {
-        headers: { 'X-Auth-Token': API_KEY }
-      })
-      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
-      const data = await response.json()
+      const data = await fetchAPI('v4/competitions/PPL/standings')
       setStandings(data.standings[0].table)
       setView('standings')
     } catch (err) {
@@ -75,11 +70,7 @@ function App() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/v4/competitions/PPL/standings', {
-        headers: { 'X-Auth-Token': API_KEY }
-      })
-      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
-      const data = await response.json()
+      const data = await fetchAPI('v4/competitions/PPL/standings')
       setStandings(data.standings[0].table)
       setView('selectTeamRelegation')
     } catch (err) {
