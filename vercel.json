@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/football?path=:path*" }
+    { "source": "/api/v4/:path*", "destination": "/api/football?path=v4/:path*" }
   ]
 }

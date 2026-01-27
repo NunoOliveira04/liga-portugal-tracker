@@ -5,8 +5,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Path is required' })
   }
 
+  const apiPath = Array.isArray(path) ? path.join('/') : path
+
   try {
-    const response = await fetch(`https://api.football-data.org/v4/${path}`, {
+    const response = await fetch(`https://api.football-data.org/${apiPath}`, {
       headers: {
         'X-Auth-Token': process.env.VITE_API_KEY
       }
