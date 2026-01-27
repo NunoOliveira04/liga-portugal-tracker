@@ -4,13 +4,16 @@ import './App.css'
 const API_KEY = import.meta.env.VITE_API_KEY
 
 function App() {
-  const [view, setView] = useState('menu') // menu, selectTeam, nextMatch, standings
+  const [view, setView] = useState('menu') // menu, selectTeam, nextMatch, standings, selectTeamRelegation, relegationAnalysis
   const [teams, setTeams] = useState([])
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [nextMatch, setNextMatch] = useState(null)
   const [standings, setStandings] = useState([])
+  const [relegationData, setRelegationData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  const TOTAL_MATCHES = 34 // Liga Portugal tem 34 jornadas
 
   // Buscar equipas da Liga Portugal
   const fetchTeams = async () => {
@@ -73,11 +76,84 @@ function App() {
     }
   }
 
+  // Buscar dados para análise de despromoção
+  const fetchTeamsForRelegation = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await fetch('/api/v4/competitions/PPL/standings', {
+        headers: { 'X-Auth-Token': API_KEY }
+      })
+      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
+      const data = await response.json()
+      setStandings(data.standings[0].table)
+      setView('selectTeamRelegation')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Analisar possibilidade de despromoção
+  const analyzeRelegation = (team) => {
+    const teamData = standings.find(t => t.team.id === team.team.id)
+    const relegationZoneTeam = standings.find(t => t.position === 17) // 17º lugar = primeira posição de despromoção
+    
+    if (!teamData || !relegationZoneTeam) return
+
+    const teamPoints = teamData.points
+    const teamGamesPlayed = teamData.playedGames
+    const teamGamesRemaining = TOTAL_MATCHES - teamGamesPlayed
+    const teamPosition = teamData.position
+
+    const relegationPoints = relegationZoneTeam.points
+    const relegationGamesPlayed = relegationZoneTeam.playedGames
+    const relegationGamesRemaining = TOTAL_MATCHES - relegationGamesPlayed
+    const relegationMaxPoints = relegationPoints + (relegationGamesRemaining * 3)
+
+    // A equipa está matematicamente segura se os seus pontos atuais são maiores que o máximo que o 17º pode fazer
+    const isMathematicallySafe = teamPoints > relegationMaxPoints
+
+    // Pontos necessários para estar seguro
+    const pointsNeededForSafety = Math.max(0, relegationMaxPoints + 1 - teamPoints)
+    
+    // Vitórias necessárias (arredondado para cima)
+    const winsNeeded = Math.ceil(pointsNeededForSafety / 3)
+
+    // Verificar se ainda pode descer (se o máximo de pontos da equipa é menor que os pontos do 17º)
+    const teamMaxPoints = teamPoints + (teamGamesRemaining * 3)
+    const canStillBeRelegated = teamMaxPoints >= relegationPoints && teamPosition > 16
+
+    // Já está na zona de despromoção?
+    const isInRelegationZone = teamPosition >= 17
+
+    setRelegationData({
+      team: teamData,
+      relegationZoneTeam,
+      teamPoints,
+      teamGamesRemaining,
+      teamPosition,
+      relegationPoints,
+      relegationMaxPoints,
+      relegationGamesRemaining,
+      isMathematicallySafe,
+      pointsNeededForSafety,
+      winsNeeded,
+      canStillBeRelegated,
+      isInRelegationZone,
+      teamMaxPoints
+    })
+    setSelectedTeam(teamData)
+    setView('relegationAnalysis')
+  }
+
   const goToMenu = () => {
     setView('menu')
     setSelectedTeam(null)
     setNextMatch(null)
     setStandings([])
+    setRelegationData(null)
     setError(null)
   }
 
@@ -122,6 +198,9 @@ function App() {
           </button>
           <button onClick={fetchStandings} className="btn btn-primary">
             🏆 Tabela Classificativa
+          </button>
+          <button onClick={fetchTeamsForRelegation} className="btn btn-primary">
+            📉 Análise de Despromoção
           </button>
         </div>
       </div>
@@ -252,6 +331,129 @@ function App() {
         <button onClick={goToMenu} className="btn btn-secondary">
           🏠 Menu Principal
         </button>
+      </div>
+    )
+  }
+
+  // Selecionar Equipa para Análise de Despromoção
+  if (view === 'selectTeamRelegation') {
+    return (
+      <div className="container">
+        <h1>📉 Análise de Despromoção</h1>
+        <p className="subtitle">Escolhe uma equipa para analisar</p>
+        <div className="teams-grid">
+          {standings.map(team => (
+            <button
+              key={team.team.id}
+              onClick={() => analyzeRelegation(team)}
+              className={`team-card ${team.position >= 17 ? 'relegation-zone' : ''}`}
+            >
+              <img src={team.team.crest} alt={team.team.name} className="team-crest" />
+              <span>{team.team.shortName || team.team.name}</span>
+              <span className="team-position">{team.position}º - {team.points}pts</span>
+            </button>
+          ))}
+        </div>
+        <button onClick={goToMenu} className="btn btn-secondary">
+          ← Voltar ao Menu
+        </button>
+      </div>
+    )
+  }
+
+  // Análise de Despromoção
+  if (view === 'relegationAnalysis' && relegationData) {
+    const { 
+      team, relegationZoneTeam, teamPoints, teamGamesRemaining, teamPosition,
+      relegationPoints, relegationMaxPoints, isMathematicallySafe,
+      pointsNeededForSafety, winsNeeded, isInRelegationZone, teamMaxPoints
+    } = relegationData
+
+    return (
+      <div className="container">
+        <h1>📉 Análise de Despromoção</h1>
+        
+        <div className="relegation-card">
+          <div className="relegation-team-header">
+            <img src={team.team.crest} alt={team.team.name} className="relegation-crest" />
+            <div>
+              <h2>{team.team.name}</h2>
+              <p>{teamPosition}º lugar • {teamPoints} pontos • {teamGamesRemaining} jogos restantes</p>
+            </div>
+          </div>
+
+          {isInRelegationZone ? (
+            <div className="relegation-status danger">
+              <h3>⚠️ EM ZONA DE DESPROMOÇÃO</h3>
+              <p>A equipa está atualmente em posição de descida de divisão.</p>
+            </div>
+          ) : isMathematicallySafe ? (
+            <div className="relegation-status safe">
+              <h3>✅ MATEMATICAMENTE SEGURO</h3>
+              <p>A equipa já não pode descer de divisão esta temporada!</p>
+            </div>
+          ) : (
+            <div className="relegation-status warning">
+              <h3>⚡ AINDA PODE DESCER</h3>
+              <p>A equipa ainda não está matematicamente segura.</p>
+            </div>
+          )}
+
+          <div className="relegation-details">
+            <div className="detail-box">
+              <span className="detail-label">Pontos Atuais</span>
+              <span className="detail-value">{teamPoints}</span>
+            </div>
+            <div className="detail-box">
+              <span className="detail-label">Máximo Possível</span>
+              <span className="detail-value">{teamMaxPoints}</span>
+            </div>
+            <div className="detail-box">
+              <span className="detail-label">17º Lugar ({relegationZoneTeam.team.shortName})</span>
+              <span className="detail-value">{relegationPoints} pts</span>
+            </div>
+            <div className="detail-box">
+              <span className="detail-label">Máx. do 17º</span>
+              <span className="detail-value">{relegationMaxPoints}</span>
+            </div>
+          </div>
+
+          {!isMathematicallySafe && !isInRelegationZone && (
+            <div className="relegation-safety">
+              <h3>🎯 Para garantir a manutenção:</h3>
+              <div className="safety-info">
+                <div className="safety-box">
+                  <span className="safety-number">{pointsNeededForSafety}</span>
+                  <span className="safety-label">pontos necessários</span>
+                </div>
+                <div className="safety-box">
+                  <span className="safety-number">{winsNeeded}</span>
+                  <span className="safety-label">{winsNeeded === 1 ? 'vitória necessária' : 'vitórias necessárias'}</span>
+                </div>
+              </div>
+              <p className="safety-note">
+                * Considerando que o 17º lugar ({relegationZoneTeam.team.shortName}) ganha todos os {TOTAL_MATCHES - relegationZoneTeam.playedGames} jogos restantes
+              </p>
+            </div>
+          )}
+
+          {isInRelegationZone && (
+            <div className="relegation-safety">
+              <h3>🎯 Para sair da zona de despromoção:</h3>
+              <p>Precisa ultrapassar o {16}º lugar na tabela classificativa.</p>
+              <p>Diferença atual para o 16º: {standings.find(t => t.position === 16)?.points - teamPoints} pontos</p>
+            </div>
+          )}
+        </div>
+
+        <div className="btn-group">
+          <button onClick={() => setView('selectTeamRelegation')} className="btn btn-secondary">
+            ← Escolher outra equipa
+          </button>
+          <button onClick={goToMenu} className="btn btn-secondary">
+            🏠 Menu Principal
+          </button>
+        </div>
       </div>
     )
   }

@@ -315,3 +315,163 @@ h1 {
 .relegation-dot {
   background: #e74c3c;
 }
+
+/* Subtitle */
+.subtitle {
+  color: #a0a0a0;
+  margin-bottom: 1.5rem;
+}
+
+/* Team card com posição */
+.team-card .team-position {
+  font-size: 0.7rem;
+  color: #a0a0a0;
+  margin-top: 0.3rem;
+}
+
+.team-card.relegation-zone {
+  border-color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* Análise de Despromoção */
+.relegation-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.relegation-team-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.relegation-crest {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.relegation-team-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.relegation-team-header p {
+  margin: 0;
+  color: #a0a0a0;
+  font-size: 0.95rem;
+}
+
+/* Status boxes */
+.relegation-status {
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.relegation-status h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.relegation-status p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.relegation-status.safe {
+  background: rgba(0, 184, 148, 0.2);
+  border: 1px solid #00b894;
+}
+
+.relegation-status.warning {
+  background: rgba(241, 196, 15, 0.2);
+  border: 1px solid #f1c40f;
+}
+
+.relegation-status.danger {
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid #e74c3c;
+}
+
+/* Details grid */
+.relegation-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-box {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #a0a0a0;
+  margin-bottom: 0.3rem;
+}
+
+.detail-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Safety section */
+.relegation-safety {
+  background: rgba(0, 184, 148, 0.1);
+  border: 1px solid rgba(0, 184, 148, 0.3);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.relegation-safety h3 {
+  margin: 0 0 1rem 0;
+  color: #00b894;
+}
+
+.safety-info {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.safety-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.safety-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00b894;
+}
+
+.safety-label {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+}
+
+.safety-note {
+  font-size: 0.8rem;
+  color: #636e72;
+  margin: 0;
+  font-style: italic;
+}
