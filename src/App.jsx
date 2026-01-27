@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 
 const API_KEY = import.meta.env.VITE_API_KEY
@@ -22,13 +22,33 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const navigateTo = useCallback((newView) => {
+    setView(newView)
+    window.history.pushState({ view: newView }, '', '')
+  }, [])
+
+  useEffect(() => {
+    window.history.replaceState({ view: 'menu' }, '', '')
+    
+    const handlePopState = (event) => {
+      if (event.state?.view) {
+        setView(event.state.view)
+      } else {
+        setView('menu')
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   const fetchTeams = async () => {
     setLoading(true)
     setError(null)
     try {
       const data = await fetchAPI('v4/competitions/PPL/teams')
       setTeams(data.teams)
-      setView('selectTeam')
+      navigateTo('selectTeam')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -44,7 +64,7 @@ function App() {
       const data = await fetchAPI(`v4/teams/${team.id}/matches?status=SCHEDULED&limit=5`)
       const ligaMatch = data.matches.find(m => m.competition.code === 'PPL')
       setNextMatch(ligaMatch || null)
-      setView('nextMatch')
+      navigateTo('nextMatch')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -58,7 +78,7 @@ function App() {
     try {
       const data = await fetchAPI('v4/competitions/PPL/standings')
       setStandings(data.standings[0].table)
-      setView('standings')
+      navigateTo('standings')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -72,7 +92,7 @@ function App() {
     try {
       const data = await fetchAPI('v4/competitions/PPL/standings')
       setStandings(data.standings[0].table)
-      setView('selectTeamRelegation')
+      navigateTo('selectTeamRelegation')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -120,16 +140,20 @@ function App() {
       teamMaxPoints
     })
     setSelectedTeam(teamData)
-    setView('relegationAnalysis')
+    navigateTo('relegationAnalysis')
   }
 
   const goToMenu = () => {
-    setView('menu')
+    navigateTo('menu')
     setSelectedTeam(null)
     setNextMatch(null)
     setStandings([])
     setRelegationData(null)
     setError(null)
+  }
+
+  const goBack = () => {
+    window.history.back()
   }
 
   const formatDate = (dateString) => {
@@ -252,7 +276,7 @@ function App() {
         )}
 
         <div className="btn-group">
-          <button onClick={() => setView('selectTeam')} className="btn btn-secondary">
+          <button onClick={goBack} className="btn btn-secondary">
             ← Escolher outra equipa
           </button>
           <button onClick={goToMenu} className="btn btn-secondary">
@@ -434,7 +458,7 @@ function App() {
         </div>
 
         <div className="btn-group">
-          <button onClick={() => setView('selectTeamRelegation')} className="btn btn-secondary">
+          <button onClick={goBack} className="btn btn-secondary">
             ← Escolher outra equipa
           </button>
           <button onClick={goToMenu} className="btn btn-secondary">
