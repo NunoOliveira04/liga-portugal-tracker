@@ -5,12 +5,29 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   min-height: 100vh;
   color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: 
+    linear-gradient(135deg, rgba(20, 30, 48, 0.95) 0%, rgba(17, 25, 40, 0.92) 100%),
+    url('https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?q=80&w=2000') center/cover fixed;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at top left, rgba(0, 184, 148, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(108, 92, 231, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 #root {
@@ -18,6 +35,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -277,8 +296,20 @@ h1 {
 }
 
 /* Zonas da tabela */
-.standings-table tr.champions {
+.standings-table tr.champions-league {
   border-left: 3px solid #00b894;
+}
+
+.standings-table tr.europa-league {
+  border-left: 3px solid #0984e3;
+}
+
+.standings-table tr.conference-league {
+  border-left: 3px solid #6c5ce7;
+}
+
+.standings-table tr.playoff {
+  border-left: 3px solid #fdcb6e;
 }
 
 .standings-table tr.relegation {
@@ -289,7 +320,7 @@ h1 {
 .standings-legend {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   margin: 1.5rem 0;
   flex-wrap: wrap;
 }
@@ -298,7 +329,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #a0a0a0;
 }
 
@@ -308,8 +339,20 @@ h1 {
   border-radius: 3px;
 }
 
-.champions-dot {
+.champions-league-dot {
   background: #00b894;
+}
+
+.europa-league-dot {
+  background: #0984e3;
+}
+
+.conference-league-dot {
+  background: #6c5ce7;
+}
+
+.playoff-dot {
+  background: #fdcb6e;
 }
 
 .relegation-dot {

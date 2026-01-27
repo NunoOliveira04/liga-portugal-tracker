@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './App.css'
 
 const API_KEY = import.meta.env.VITE_API_KEY
+const TOTAL_MATCHES = 34
 
 function App() {
-  const [view, setView] = useState('menu') // menu, selectTeam, nextMatch, standings, selectTeamRelegation, relegationAnalysis
+  const [view, setView] = useState('menu')
   const [teams, setTeams] = useState([])
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [nextMatch, setNextMatch] = useState(null)
@@ -13,9 +14,6 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const TOTAL_MATCHES = 34 // Liga Portugal tem 34 jornadas
-
-  // Buscar equipas da Liga Portugal
   const fetchTeams = async () => {
     setLoading(true)
     setError(null)
@@ -34,7 +32,6 @@ function App() {
     }
   }
 
-  // Buscar próximo jogo de uma equipa
   const fetchNextMatch = async (team) => {
     setLoading(true)
     setError(null)
@@ -46,7 +43,6 @@ function App() {
       if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
       const data = await response.json()
       
-      // Encontrar o próximo jogo na Liga Portugal
       const ligaMatch = data.matches.find(m => m.competition.code === 'PPL')
       setNextMatch(ligaMatch || null)
       setView('nextMatch')
@@ -57,7 +53,6 @@ function App() {
     }
   }
 
-  // Buscar tabela classificativa
   const fetchStandings = async () => {
     setLoading(true)
     setError(null)
@@ -76,7 +71,6 @@ function App() {
     }
   }
 
-  // Buscar dados para análise de despromoção
   const fetchTeamsForRelegation = async () => {
     setLoading(true)
     setError(null)
@@ -95,10 +89,9 @@ function App() {
     }
   }
 
-  // Analisar possibilidade de despromoção
   const analyzeRelegation = (team) => {
     const teamData = standings.find(t => t.team.id === team.team.id)
-    const relegationZoneTeam = standings.find(t => t.position === 17) // 17º lugar = primeira posição de despromoção
+    const relegationZoneTeam = standings.find(t => t.position === 17)
     
     if (!teamData || !relegationZoneTeam) return
 
@@ -112,20 +105,11 @@ function App() {
     const relegationGamesRemaining = TOTAL_MATCHES - relegationGamesPlayed
     const relegationMaxPoints = relegationPoints + (relegationGamesRemaining * 3)
 
-    // A equipa está matematicamente segura se os seus pontos atuais são maiores que o máximo que o 17º pode fazer
     const isMathematicallySafe = teamPoints > relegationMaxPoints
-
-    // Pontos necessários para estar seguro
     const pointsNeededForSafety = Math.max(0, relegationMaxPoints + 1 - teamPoints)
-    
-    // Vitórias necessárias (arredondado para cima)
     const winsNeeded = Math.ceil(pointsNeededForSafety / 3)
-
-    // Verificar se ainda pode descer (se o máximo de pontos da equipa é menor que os pontos do 17º)
     const teamMaxPoints = teamPoints + (teamGamesRemaining * 3)
     const canStillBeRelegated = teamMaxPoints >= relegationPoints && teamPosition > 16
-
-    // Já está na zona de despromoção?
     const isInRelegationZone = teamPosition >= 17
 
     setRelegationData({
@@ -167,6 +151,15 @@ function App() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const getPositionClass = (position) => {
+    if (position <= 2) return 'champions-league'
+    if (position === 3) return 'europa-league'
+    if (position === 4) return 'conference-league'
+    if (position === 16) return 'playoff'
+    if (position >= 17) return 'relegation'
+    return ''
   }
 
   if (loading) {
@@ -303,7 +296,7 @@ function App() {
             </thead>
             <tbody>
               {standings.map((team) => (
-                <tr key={team.team.id} className={team.position <= 4 ? 'champions' : team.position >= 17 ? 'relegation' : ''}>
+                <tr key={team.team.id} className={getPositionClass(team.position)}>
                   <td className="position">{team.position}</td>
                   <td className="team-name">
                     <img src={team.team.crest} alt={team.team.name} />
@@ -324,7 +317,10 @@ function App() {
         </div>
 
         <div className="standings-legend">
-          <span className="legend-item"><span className="dot champions-dot"></span> Liga dos Campeões</span>
+          <span className="legend-item"><span className="dot champions-league-dot"></span> Liga dos Campeões</span>
+          <span className="legend-item"><span className="dot europa-league-dot"></span> Liga Europa</span>
+          <span className="legend-item"><span className="dot conference-league-dot"></span> Liga Conferência</span>
+          <span className="legend-item"><span className="dot playoff-dot"></span> Playoff Desprom.</span>
           <span className="legend-item"><span className="dot relegation-dot"></span> Despromoção</span>
         </div>
 
