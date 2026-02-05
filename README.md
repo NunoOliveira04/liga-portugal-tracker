@@ -8,7 +8,9 @@ Vercel app: https://liga-portugal-tracker.vercel.app/
 
 ## Preview
 
-![Liga Portugal Tracker - Home](public/HomePage.JPG)
+<p align="center">
+	<img src="public/HomePage.JPG" alt="Liga Portugal Tracker home screen" width="820" />
+</p>
 
 ## What This Project Does
 
