@@ -2,6 +2,10 @@
 
 A React application to track Liga Portugal (Portuguese First Division) matches, standings and statistics.
 
+## Live Demo
+
+Vercel app: https://liga-portugal-tracker.vercel.app/
+
 ## Features
 
 - **Next Match** - View upcoming matches for any team (date, opponent, home/away)

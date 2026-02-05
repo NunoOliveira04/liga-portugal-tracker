@@ -61,9 +61,12 @@ function App() {
     setError(null)
     setSelectedTeam(team)
     try {
-      const data = await fetchAPI(`v4/teams/${team.id}/matches?status=SCHEDULED&limit=5`)
-      const ligaMatch = data.matches.find(m => m.competition.code === 'PPL')
-      setNextMatch(ligaMatch || null)
+      const data = await fetchAPI(`v4/teams/${team.id}/matches?status=SCHEDULED&limit=50`)
+      const now = new Date()
+      const ligaMatches = data.matches
+        .filter((match) => match.competition.code === 'PPL' && new Date(match.utcDate) >= now)
+        .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
+      setNextMatch(ligaMatches[0] || null)
       navigateTo('nextMatch')
     } catch (err) {
       setError(err.message)
