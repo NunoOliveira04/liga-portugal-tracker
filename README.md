@@ -1,16 +1,28 @@
 # Liga Portugal Tracker
 
-A React application to track Liga Portugal (Portuguese First Division) matches, standings and statistics.
+A lightweight web app that turns Liga Portugal data into something you can explore fast: upcoming fixtures, the live table, and a simple relegation safety check. Built for fans who want the essentials without the noise.
 
 ## Live Demo
 
 Vercel app: https://liga-portugal-tracker.vercel.app/
 
-## Features
+## Preview
 
-- **Next Match** - View upcoming matches for any team (date, opponent, home/away)
-- **Standings Table** - Full league table with Champions League, Europa League, Conference League and relegation zones
-- **Relegation Analysis** - Check if a team can still be relegated and how many wins they need to be mathematically safe
+![Liga Portugal Tracker - Home](public/HomePage.JPG)
+
+## What This Project Does
+
+- Lets you pick any team and instantly see its next scheduled league match
+- Shows the current standings with visual cues for European spots and relegation places
+- Runs a quick relegation analysis to estimate safety and remaining requirements
+
+This project uses the football-data.org API and wraps it with a small API proxy so the app can stay clean and focused on the UI.
+
+## Key Features
+
+- **Next Match** - Upcoming fixture for a chosen club, with date, opponent, and home/away
+- **Standings Table** - Full league table with Champions League, Europa League, Conference League, playoff, and relegation zones
+- **Relegation Analysis** - Checks if a team can still be relegated and how many wins are needed to be mathematically safe
 
 ## Getting Started
 
